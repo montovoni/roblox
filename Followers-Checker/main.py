@@ -2,7 +2,6 @@ import requests
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-
 def get_roblox_followers(user_id):
     url = f"https://friends.roblox.com/v1/users/{user_id}/followers?limit=100"
     all_followers = []
@@ -50,7 +49,6 @@ def get_roblox_followers(user_id):
     except requests.exceptions.RequestException as e:
         messagebox.showerror("Erro", f"Erro ao acessar a API: {e}")
 
-
 def get_usernames(user_ids):
     url = "https://users.roblox.com/v1/users"
     payload = {"userIds": user_ids}
@@ -72,7 +70,6 @@ def on_search():
         messagebox.showerror("Erro", "Por favor, insira um ID válido (somente números).")
         return
     get_roblox_followers(user_id)
-
 
 # Criando a interface gráfica melhorada
 root = tk.Tk()
