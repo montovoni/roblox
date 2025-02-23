@@ -7,7 +7,7 @@
          \/          \/         \/    \/                \/     \/     \/                   
           \_Welcome to LuaObfuscator.com   (Alpha 0.10.8) ~  Much Love, Ferib 
 
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/montovoni/Roblox/refs/heads/main/Scripts/Infinite-Jump.txt"))()		  
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/montovoni/Roblox/refs/heads/main/Scripts/Infinite-Jump.lua"))()		  
 	
 ]]--
 
