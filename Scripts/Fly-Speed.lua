@@ -6,6 +6,8 @@
  |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
          \/          \/         \/    \/                \/     \/     \/                   
           \_Welcome to LuaObfuscator.com   (Alpha 0.10.8) ~  Much Love, Ferib 
+ 
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/montovoni/Roblox/refs/heads/main/Scripts/Fly-Speed.lua"))()
 
 ]]--
 
