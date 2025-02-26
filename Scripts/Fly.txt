@@ -1,0 +1,382 @@
+-- Espera até que o jogo esteja carregado e o jogador local esteja pronto
+repeat wait() until game:IsLoaded() and game.Players and game.Players.LocalPlayer and game.Players.LocalPlayer.Character
+
+-------------------------------------------------------------------------------
+
+-- Verifica se o script já foi executado antes para evitar duplicação
+if getgenv().GuiExecuted then 
+    -- Se a GUI foi criada anteriormente, destrua-a
+    if game.CoreGui:FindFirstChild("thisoneissocoldww") then
+        game.CoreGui.thisoneissocoldww:Destroy()
+    end
+    getgenv().GuiExecuted = false  -- Marca que a execução foi cancelada 
+end
+
+-- Marca o script como executado
+getgenv().GuiExecuted = true
+
+-------------------------------------------------------------------------------
+
+-- Variaveis Globais
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+-------------------------------------------------------------------------------
+
+-- Cria a interface gráfica (GUI)
+local thisoneissocoldww = Instance.new("ScreenGui")
+local madebybloodofbatus = Instance.new("Frame")
+local UICornerw = Instance.new("UICorner")
+local uselesslabelone = Instance.new("TextLabel")
+local expandButton = Instance.new("TextButton") -- Botão para expandir
+local creditsLabel = Instance.new("TextLabel") -- Label para os créditos
+local UICornerww = Instance.new("UICorner")
+
+-- Configurações da GUI
+thisoneissocoldww.Name = "thisoneissocoldww"
+thisoneissocoldww.Parent = game.CoreGui
+thisoneissocoldww.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+madebybloodofbatus.Name = "madebybloodofbatus"
+madebybloodofbatus.Parent = thisoneissocoldww
+madebybloodofbatus.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+madebybloodofbatus.Position = UDim2.new(0.0854133144, 0, 0.13128835, 0)
+madebybloodofbatus.Size = UDim2.new(0, 230, 0, 25) -- Tamanho inicial da GUI
+
+UICornerw.Parent = madebybloodofbatus
+UICornerw.CornerRadius = UDim.new(0, 5)
+
+-------------------------------------------------------------------------------
+
+-- Labels
+uselesslabelone.Name = "uselesslabelone"
+uselesslabelone.Parent = madebybloodofbatus
+uselesslabelone.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+uselesslabelone.BackgroundTransparency = 1.000
+uselesslabelone.Size = UDim2.new(0, 95, 0, 24)
+uselesslabelone.Font = Enum.Font.SourceSans
+uselesslabelone.Text = "Fly Speed"
+uselesslabelone.TextColor3 = Color3.fromRGB(255, 255, 255)
+uselesslabelone.TextSize = 16
+uselesslabelone.TextXAlignment = Enum.TextXAlignment.Center
+uselesslabelone.Position = UDim2.new(0.5, -uselesslabelone.Size.X.Offset / 2, 0, 0)
+uselesslabelone.Font = Enum.Font.ArialBold
+
+-------------------------------------------------------------------------------
+
+-- Botão expandir
+expandButton.Name = "expandButton"
+expandButton.Parent = madebybloodofbatus
+expandButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+expandButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+expandButton.Text = "+"
+expandButton.Size = UDim2.new(0, 25, 0, 25)
+expandButton.Position = UDim2.new(1, -25, 0, 0)
+expandButton.Font = Enum.Font.ArialBold
+expandButton.TextSize = 16
+expandButton.ZIndex = 2
+
+UICornerww.Parent = expandButton
+
+-------------------------------------------------------------------------------
+
+-- Label para créditos (inicialmente escondida)
+creditsLabel.Name = "creditsLabel"
+creditsLabel.Parent = madebybloodofbatus
+creditsLabel.Text = "Discord: montovoni"
+creditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+creditsLabel.BackgroundTransparency = 1
+creditsLabel.Size = UDim2.new(0, 200, 0, 20)
+creditsLabel.AnchorPoint = Vector2.new(0.5, 1)
+creditsLabel.Position = UDim2.new(0.5, 0, 1, -5)
+creditsLabel.Font = Enum.Font.ArialBold
+creditsLabel.TextSize = 16
+creditsLabel.Visible = false
+
+-------------------------------------------------------------------------------
+
+-- Criando um contêiner para os botões adicionais
+local extraButtonsContainer = Instance.new("Frame")
+extraButtonsContainer.Name = "extraButtonsContainer"
+extraButtonsContainer.Parent = madebybloodofbatus
+extraButtonsContainer.BackgroundTransparency = 1
+extraButtonsContainer.Size = UDim2.new(1, -10, 0, 60)
+extraButtonsContainer.Position = UDim2.new(0, 5, 0, uselesslabelone.Size.Y.Offset + 10)
+extraButtonsContainer.Visible = false
+
+-- Criação do container para o CheckboxFly
+local checkboxContainer = Instance.new("Frame")
+checkboxContainer.Name = "CheckboxContainer"
+checkboxContainer.Parent = extraButtonsContainer
+checkboxContainer.BackgroundTransparency = 1
+checkboxContainer.Size = UDim2.new(1, -10, 0, 20)
+checkboxContainer.Position = UDim2.new(0, 5, 0, 0)
+
+-------------------------------------------------------------------------------
+
+local IYMouse = LocalPlayer:GetMouse()
+local flyKeyDown, flyKeyUp
+
+-- Função para obter a raiz do personagem
+function getRoot(char)
+    local rootPart = char:FindFirstChild('HumanoidRootPart') or char:FindFirstChild('Torso') or char:FindFirstChild('UpperTorso')
+    return rootPart
+end
+
+-- Variáveis de controle
+FLYING = false
+QEfly = true
+iyflyspeed = 1
+vehicleflyspeed = 1
+
+
+-- Criação do CheckboxFlyLabel
+local CheckboxFlyLabel = Instance.new("TextLabel")
+CheckboxFlyLabel.Name = "CheckboxFlyLabel"
+CheckboxFlyLabel.Parent = checkboxContainer
+CheckboxFlyLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckboxFlyLabel.BackgroundTransparency = 1
+CheckboxFlyLabel.TextXAlignment = Enum.TextXAlignment.Left
+CheckboxFlyLabel.Font = Enum.Font.ArialBold
+CheckboxFlyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CheckboxFlyLabel.TextSize = 16
+CheckboxFlyLabel.Size = UDim2.new(0, 100, 0, 20)
+CheckboxFlyLabel.Text = "Fly Speed"
+CheckboxFlyLabel.Position = UDim2.new(0, 0, 0, 0)
+
+-- Criação do CheckboxFly
+local CheckboxFly = Instance.new("Frame")
+CheckboxFly.Name = "CheckboxFly"
+CheckboxFly.Parent = checkboxContainer
+CheckboxFly.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CheckboxFly.AnchorPoint = Vector2.new(1, 0)
+CheckboxFly.Position = UDim2.new(1, -5, 0, 0)
+CheckboxFly.Size = UDim2.new(0, 18, 0, 18)
+CheckboxFly.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Arredondando as pontas do CheckboxFly
+local UICornerCheckboxFly = Instance.new("UICorner")
+UICornerCheckboxFly.Parent = CheckboxFly
+UICornerCheckboxFly.CornerRadius = UDim.new(0, 3)
+
+-- Criação do CheckboxFlyButton
+local CheckboxFlyButton = Instance.new("TextButton")
+CheckboxFlyButton.Name = "CheckboxFlyButton"
+CheckboxFlyButton.Parent = CheckboxFly
+CheckboxFlyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CheckboxFlyButton.Size = UDim2.new(1, 0, 1, 0)
+CheckboxFlyButton.Text = "✔️"
+
+-- Arredondando o CheckboxFlyButton
+local UICornerCheckboxFlyButton = Instance.new("UICorner")
+UICornerCheckboxFlyButton.Parent = CheckboxFlyButton
+UICornerCheckboxFlyButton.CornerRadius = UDim.new(0, 3)
+
+-- Função para lidar com o clique no CheckboxFly
+CheckboxFlyButton.MouseButton1Click:Connect(function()
+    isFlyEnabled = not isFlyEnabled -- Inverte o estado
+
+    if isFlyEnabled then
+        CheckboxFlyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Verde quando marcado
+        sFLY()  -- Ativa o fly
+    else
+        CheckboxFlyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Cinza quando desmarcado
+        NOFLY()  -- Desativa o fly
+    end
+end)
+
+-------------------------------------------------------------------------------
+
+-- Função para expandir/retrair a GUI
+local expanded = false
+expandButton.MouseButton1Click:Connect(function()
+    expanded = not expanded
+
+    if expanded then
+        madebybloodofbatus.Size = UDim2.new(0, 230, 0, 90)
+        creditsLabel.Visible = true
+        expandButton.Text = "-"
+        extraButtonsContainer.Visible = true
+    else
+        madebybloodofbatus.Size = UDim2.new(0, 230, 0, 25)
+        creditsLabel.Visible = false
+        expandButton.Text = "+"
+        extraButtonsContainer.Visible = false
+    end
+end)
+
+-------------------------------------------------------------------------------
+
+-- Função para arrastar a GUI pela tela
+local Drag = madebybloodofbatus
+local UserInputService = game:GetService("UserInputService")
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    local dragTime = 0.04
+    local SmoothDrag = {}
+    SmoothDrag.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    local dragSmoothFunction = game:GetService("TweenService"):Create(Drag, TweenInfo.new(dragTime, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), SmoothDrag)
+    dragSmoothFunction:Play()
+end
+
+Drag.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Drag.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Drag.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging and Drag.Size then
+        update(input)
+    end
+end)
+
+-------------------------------------------------------------------------------
+
+local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+local flySpeed = 50
+
+-- Função de voo (sFLY) atualizada para usar a variável flySpeed
+function sFLY(vfly)
+    repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    repeat wait() until IYMouse
+
+    if flyKeyDown then flyKeyDown:Disconnect() end
+    if flyKeyUp then flyKeyUp:Disconnect() end
+
+    local T = getRoot(Players.LocalPlayer.Character)
+    local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+    local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+    local function FLY()
+        FLYING = true
+        local BG = Instance.new('BodyGyro')
+        local BV = Instance.new('BodyVelocity')
+        BG.P = 9e4
+        BG.Parent = T
+        BV.Parent = T
+        BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        BG.cframe = T.CFrame
+        BV.velocity = Vector3.new(0, 0, 0)
+        BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        task.spawn(function()
+            repeat wait()
+                if not vfly and Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+                    Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
+                end
+                if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
+                    SPEED = flySpeed -- Usa a variável flySpeed
+                elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0) and SPEED ~= 0 then
+                    SPEED = 0
+                end
+                if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 or (CONTROL.Q + CONTROL.E) ~= 0 then
+                    BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+                    lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
+                elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
+                    BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
+                else
+                    BV.velocity = Vector3.new(0, 0, 0)
+                end
+                BG.cframe = workspace.CurrentCamera.CoordinateFrame
+            until not FLYING
+            CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+            lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+            SPEED = 0
+            BG:Destroy()
+            BV:Destroy()
+            if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+                Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+            end
+        end)
+    end
+
+    -- Verifica o estado das teclas imediatamente após ativar o fly
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+        CONTROL.F = (vfly and vehicleflyspeed or iyflyspeed)
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+        CONTROL.B = - (vfly and vehicleflyspeed or iyflyspeed)
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+        CONTROL.L = - (vfly and vehicleflyspeed or iyflyspeed)
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+        CONTROL.R = (vfly and vehicleflyspeed or iyflyspeed)
+    end
+    if QEfly and UserInputService:IsKeyDown(Enum.KeyCode.E) then
+        CONTROL.Q = (vfly and vehicleflyspeed or iyflyspeed)*2
+    end
+    if QEfly and UserInputService:IsKeyDown(Enum.KeyCode.Q) then
+        CONTROL.E = -(vfly and vehicleflyspeed or iyflyspeed)*2
+    end
+
+    -- Reconecta os eventos de teclado
+    flyKeyDown = IYMouse.KeyDown:Connect(function(KEY)
+        if KEY:lower() == 'w' then
+            CONTROL.F = (vfly and vehicleflyspeed or iyflyspeed)
+        elseif KEY:lower() == 's' then
+            CONTROL.B = - (vfly and vehicleflyspeed or iyflyspeed)
+        elseif KEY:lower() == 'a' then
+            CONTROL.L = - (vfly and vehicleflyspeed or iyflyspeed)
+        elseif KEY:lower() == 'd' then 
+            CONTROL.R = (vfly and vehicleflyspeed or iyflyspeed)
+        elseif QEfly and KEY:lower() == 'e' then
+            CONTROL.Q = (vfly and vehicleflyspeed or iyflyspeed)*2
+        elseif QEfly and KEY:lower() == 'q' then
+            CONTROL.E = -(vfly and vehicleflyspeed or iyflyspeed)*2
+        end
+        pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Track end)
+    end)
+
+    flyKeyUp = IYMouse.KeyUp:Connect(function(KEY)
+        if KEY:lower() == 'w' then
+            CONTROL.F = 0
+        elseif KEY:lower() == 's' then
+            CONTROL.B = 0
+        elseif KEY:lower() == 'a' then
+            CONTROL.L = 0
+        elseif KEY:lower() == 'd' then
+            CONTROL.R = 0
+        elseif KEY:lower() == 'e' then
+            CONTROL.Q = 0
+        elseif KEY:lower() == 'q' then
+            CONTROL.E = 0
+        end
+    end)
+
+    FLY()
+end
+
+-- Função para desativar o fly
+function NOFLY()
+    FLYING = false
+    if flyKeyDown then flyKeyDown:Disconnect() end
+    if flyKeyUp then flyKeyUp:Disconnect() end
+    if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
+        Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+    end
+    pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
+end
+
+-------------------------------------------------------------------------------
